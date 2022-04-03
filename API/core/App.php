@@ -14,8 +14,7 @@ class App
 
 
         if (isset($url)) {
-            if ($url[0] == 'users') $url[0] = 'Users';
-            if ($url[0] == 'auth') $url[0] = 'Auth';
+            ucwords($url[0]);
             if (file_exists("API/$url[0].php")) {
                 $this->API = $url[0];
                 unset($url[0]);
