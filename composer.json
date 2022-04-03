@@ -1,0 +1,13 @@
+{
+    "name": "martuafernando/jwt-martuafernando",
+    "description": "Project API Pemrograman Web",
+    "authors": [
+        {
+            "name": "martuafernando",
+            "email": "fernandosibarani45@gmail.com"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^5.5"
+    }
+}
