@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Helper/TokenJWT.php';
-
 class App
 {
     protected $API = 'Indexes';
@@ -11,10 +9,9 @@ class App
     {
         header('Content-Type: application/json; charset=utf8');
         $url = $this->parseURL();
-
+        ucwords($url[0]);
 
         if (isset($url)) {
-            ucwords($url[0]);
             if (file_exists("API/$url[0].php")) {
                 $this->API = $url[0];
                 unset($url[0]);
@@ -43,8 +40,6 @@ class App
             }
         }
 
-        $this->tokenAuth();
-
         try {
             require_once "API/$this->API.php";
             $this->API = new $this->API;
@@ -65,56 +60,6 @@ class App
             $url = filter_var($url, FILTER_SANITIZE_URL);
             $url = explode('/', $url);
             return $url;
-        }
-    }
-
-    public function tokenAuth()
-    {
-
-        if ($this->API != 'Auth') {
-            try {
-                $headers = getallheaders();
-
-                if (!isset($headers)) {
-                    throw new Exception('Silahkan masukkan token');
-                }
-
-                if (!isset($headers['Authorization'])) {
-                    throw new Exception('Silahkan masukkan token');
-                }
-                $token = explode(' ', $headers['Authorization'])[1];
-                if (!$token) {
-                    throw new Exception('Silahkan masukkan token');
-                }
-
-                try {
-                    $payload = TokenJWT::getData($token);
-                    if (!is_string($token))
-                        throw new Exception('Token tidak valid');
-                } catch (Exception $e) {
-                    echo json_encode(['message' => 'Token tidak valid']);
-                    http_response_code(400);
-                    exit();
-                }
-
-                if (empty($payload->role) || empty($payload->user_id) || empty($payload->email))
-                    throw new Exception('Token tidak valid');
-
-                if ($payload->role != 1) {
-                    if (empty($this->parameters)) {
-                        throw new Exception('Access Denied');
-                    } else if ($this->parameters[0] != $payload->user_id) {
-                        throw new Exception('Access Denied');
-                    }
-
-                    if (($_SERVER['REQUEST_METHOD'] === 'POST') || ($_SERVER['REQUEST_METHOD'] === 'DELETE'))
-                        throw new Exception('Access Denied');
-                }
-            } catch (Exception $e) {
-                echo json_encode(['message' => $e->getMessage()]);
-                http_response_code(401);
-                exit();
-            }
         }
     }
 }

@@ -2,9 +2,13 @@
 
 class Users extends Controller
 {
+    public function __construct()
+    {
+        $this->tokenAuth();
+    }
+
     public function index($id = null)
     {
-        header('Content-Type: application/json; charset=utf8');
         $headers = getallheaders();
         $token = explode(' ', $headers['Authorization'])[1];
         if (!$token) {
@@ -39,9 +43,6 @@ class Users extends Controller
             }
         } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                if (!isset($_POST['nama']) || !isset($_POST['email']) || !isset($_POST['password']) || !isset($_POST['role']))
-                    throw new Exception('Masukkan Nama, Email, Password, dan Role');
-
                 if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
                     throw new Exception('Email tidak valid');
 
