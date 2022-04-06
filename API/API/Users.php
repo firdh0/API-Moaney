@@ -23,7 +23,6 @@ class Users extends Controller
         if (!$valid)
             throw new Exception('Token tidak valid');
 
-
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             try {
                 $result = $this->model('Users_Model')->get($id);

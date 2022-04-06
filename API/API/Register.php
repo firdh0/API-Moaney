@@ -7,11 +7,12 @@ class Register extends Controller
     public function index()
     {
         try {
-            if (!isset($_POST['email']) || !isset($_POST['password'])) {
+            if (!isset($_POST['email']) || !isset($_POST['password']) || !isset($_POST['nama'])) {
                 http_response_code(400);
-                throw new Exception('Silahkan masukkan email dan password');
+                throw new Exception('Silahkan masukkan nama, email, dan password');
             }
 
+            $_POST["nama"] = mysqli_real_escape_string($this->model('Users_Model')->getConn(), $_POST["nama"]);
             $_POST["email"] = mysqli_real_escape_string($this->model('Users_Model')->getConn(), $_POST["email"]);
             $_POST["password"] = mysqli_real_escape_string($this->model('Users_Model')->getConn(), $_POST["password"]);
 
@@ -21,20 +22,21 @@ class Register extends Controller
             }
 
             $email = $_POST["email"];
-            if (!$this->model('Users_Model')->insert($_POST))
-                throw new Exception('Data akun gagal ditambahkan');
+            if ($this->model('Users_Model')->insert($_POST) == -1)
+                throw new Exception('Data akun gagal ditambahkan cok');
 
             $result = $this->model('Users_Model')->query("SELECT * FROM user WHERE email = '$email'");
+            if (!$result) {
+                throw new Exception('Data akun gagal ditambahkan');
+            }
 
             $result = $result[0];
-            $payload = ['user_id' => $result['id'], 'email' => $result['email'], 'role' => $result['role']];
+            $payload = ['user_id' => $result['id'], 'email' => $result['email']];
 
             $token = TokenJWT::generate($payload);
             echo json_encode([
-                'status' => '1',
                 'message' => 'Register Berhasil',
-                'user_id' => $result['id'],
-                'role' => $result['role'],
+                'email' => $result['email'],
                 'token' => $token
             ]);
         } catch (Exception $e) {

@@ -1,16 +1,18 @@
 <?php
 
+use LDAP\Result;
+
 class Users_Model extends Models
 {
     private $table = 'user';
 
     public function get($id = null)
     {
-        if ($id === null) {
-            $result = mysqli_query($this->koneksi, "SELECT id as 'user_id', nama, email, role FROM $this->table;");
-        } else {
-            $result = mysqli_query($this->koneksi, "SELECT id as 'user_id', nama, email, role FROM $this->table WHERE id = '$id';");
+        if ($id == null) {
+            throw new Exception('Maaf, terdapat kesalahan internal');
         }
+
+        $result = mysqli_query($this->koneksi, "SELECT * FROM $this->table WHERE id = '$id';");
 
         if (!$result) {
             throw new Exception('Data Akun tidak ada');
@@ -27,15 +29,20 @@ class Users_Model extends Models
         $nama = htmlspecialchars($data['nama']);
         $email = htmlspecialchars($data['email']);
         $password = password_hash(htmlspecialchars($data['password']), PASSWORD_DEFAULT);
-        $role = htmlspecialchars($data['role']);
 
         $result = mysqli_query($this->koneksi, "SELECT email FROM $this->table WHERE email = '$email'");
         if (mysqli_fetch_assoc($result)) {
             throw new Exception('Email telah terdaftar');
         }
 
+        $rekening = rand(0000000000, 9999999999);
+        $result = mysqli_query($this->koneksi, "SELECT id FROM $this->table WHERE rekening = '$rekening'");
+        while (mysqli_fetch_assoc($result)) {
+            $rekening = rand(0000000000, 9999999999);
+            $result = mysqli_query($this->koneksi, "SELECT id FROM $this->table WHERE rekening = '$rekening'");
+        }
         $query =    "INSERT INTO $this->table VALUES
-                    ('', '$nama', '$email', '$password', '$role')
+                    ('', '$nama', '$email', '$password', '$rekening', '')
                     ;";
 
         mysqli_query($this->koneksi, $query);
@@ -44,24 +51,18 @@ class Users_Model extends Models
 
     public function update($id, $data)
     {
-        $nama = isset($data['nama']) ? htmlspecialchars($data['nama']) : $this->get($id)['nama'];
-        $email = isset($data['email']) ? htmlspecialchars($data['email']) : $this->get($id)['email'];
-        $password = isset($data['email']) ? password_hash(htmlspecialchars($data['password']), PASSWORD_DEFAULT) : $this->get($id)['password'];
-        $role = isset($data['role']) ? htmlspecialchars($data['role']) : $this->get($id)['role'];
-
-        $result = mysqli_query($this->koneksi, "SELECT id, email FROM $this->table WHERE email = '$email'");
-        if ($row = mysqli_fetch_assoc($result)) {
-            if ($row['id'] != $id)
-                throw new Exception('Email telah terdaftar');
-        }
+        $user_data = $this->get($id)[0];
+        $nama = isset($data['nama']) ? htmlspecialchars($data['nama']) : $user_data['nama'];
+        $email = isset($data['email']) ? htmlspecialchars($data['email']) : $user_data['email'];
+        $password = isset($data['password']) ? password_hash(htmlspecialchars($data['password']), PASSWORD_DEFAULT) : $user_data['password'];
+        $saldo = isset($data['saldo']) ? htmlspecialchars($data['saldo'] + $user_data['saldo']) : $user_data['saldo'];
 
         $query =    "UPDATE $this->table SET
                         nama = '$nama',
                         email = '$email',
                         password = '$password',
-                        role = '$role'
-                    WHERE id = '$id';
-                    ";
+                        saldo = '$saldo'
+                    WHERE id = '$id';";
 
         mysqli_query($this->koneksi, $query);
         return mysqli_affected_rows($this->koneksi);

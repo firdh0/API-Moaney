@@ -12,37 +12,43 @@ class Controller
 
     protected function tokenAuth()
     {
-        try {
-            $headers = getallheaders();
+        $headers = getallheaders();
 
-            if (!isset($headers)) {
-                throw new Exception('Silahkan masukkan token');
-            }
-
-            if (!isset($headers['Authorization'])) {
-                throw new Exception('Silahkan masukkan token');
-            }
-            $token = explode(' ', $headers['Authorization'])[1];
-            if (!$token) {
-                throw new Exception('Silahkan masukkan token');
-            }
-
-            try {
-                $payload = TokenJWT::getData($token);
-                if (!is_string($token))
-                    throw new Exception('Token tidak valid');
-            } catch (Exception $e) {
-                echo json_encode(['message' => 'Token tidak valid']);
-                http_response_code(400);
-                exit();
-            }
-
-            if (empty($payload->user_id) || empty($payload->email))
-                throw new Exception('Token tidak valid');
-        } catch (Exception $e) {
-            echo json_encode(['message' => $e->getMessage()]);
-            http_response_code(401);
-            exit();
+        if (!isset($headers)) {
+            http_response_code(400);
+            throw new Exception('Silahkan masukkan token');
         }
+
+        if (!isset($headers['Authorization'])) {
+            http_response_code(400);
+            throw new Exception('Silahkan masukkan token');
+        }
+
+        $token = explode(' ', $headers['Authorization'])[1];
+
+        if (!$token) {
+            http_response_code(400);
+            throw new Exception('Silahkan masukkan token');
+        }
+
+        $payload = TokenJWT::getData($token);
+
+        if (!is_string($token)) {
+            http_response_code(400);
+            throw new Exception('Token tidak valid');
+        }
+
+        if (empty($payload->user_id) || empty($payload->email)) {
+            http_response_code(401);
+            throw new Exception('Token tidak valid');
+        }
+
+        $result = $this->model('Users_Model')->query("SELECT id FROM user WHERE id = '$payload->user_id'");
+        if (!$result) {
+            http_response_code(401);
+            throw new Exception('Token tidak valid');
+        }
+
+        return $payload->user_id;
     }
 }

@@ -17,26 +17,20 @@ class Login extends Controller
 
             $result = $this->model('Users_Model')->query("SELECT * FROM user WHERE email = '$email'");
 
-            if (!$result) {
-                throw new Exception('Email dan Password Tidak Sesuai');
-                http_response_code(200);
-            }
+            if (!$result) throw new Exception('Email dan Password Tidak Sesuai');
 
             $result = $result[0];
 
-            if (!password_verify($password, $result['password'])) {
-                http_response_code(200);
-                throw new Exception('Email dan Password Tidak Sesuai');
-            }
+            if (!password_verify($password, $result['password']))  throw new Exception('Email dan Password Tidak Sesuai');
 
-            $payload = ['user_id' => $result['id'], 'email' => $result['email'], 'role' => $result['role']];
+            $payload = ['user_id' => $result['id'], 'email' => $result['email']];
 
             $token = TokenJWT::generate($payload);
             echo json_encode([
-                'status' => '1',
                 'message' => 'Login Berhasil',
-                'user_id' => $result['id'],
-                'role' => $result['role'],
+                'user id' => $result['id'],
+                'rekening' => $result['rekening'],
+                'saldo' => $result['saldo'],
                 'token' => $token
             ]);
         } catch (Exception $e) {
