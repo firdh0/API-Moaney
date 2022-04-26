@@ -1,7 +1,5 @@
 <?php
 
-use LDAP\Result;
-
 class Users_Model extends Models
 {
     private $table = 'user';

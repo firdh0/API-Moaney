@@ -7,8 +7,7 @@ class Bayar extends Controller
     public function __construct()
     {
         try {
-            global $current_user;
-            $current_user = $this->tokenAuth();
+            $this->current_user = $this->tokenAuth();
         } catch (Exception $e) {
             echo json_encode(['message' => $e->getMessage()]);
             exit();
@@ -17,7 +16,6 @@ class Bayar extends Controller
 
     public function index()
     {
-        global $current_user;
         try {
             if (!isset($_POST['jumlah'])) {
                 http_response_code(400);
@@ -29,18 +27,33 @@ class Bayar extends Controller
             $data = [];
             $data["saldo"] = $_POST["jumlah"] * -1;
 
-            if ($this->model('Users_Model')->query("SELECT saldo FROM user WHERE id = '$current_user'")[0]["saldo"] <  $_POST["jumlah"]) {
+            if ($data["saldo"] >= 0) {
+                http_response_code(400);
+                throw new Exception('Transaksi tidak valid');
+            }
+
+            if ($this->model('Users_Model')->query("SELECT saldo FROM user WHERE id = '$this->current_user'")[0]["saldo"] <  $_POST["jumlah"]) {
                 http_response_code(400);
                 throw new Exception('Saldo tidak mencukupi');
             }
 
-            if ($this->model('Users_Model')->update($current_user, $data) == -1) {
-                http_response_code(500);
-                throw new Exception('Top Up Gagal');
+            if ($this->model('Users_Model')->update($this->current_user, $data) == -1) {
+                http_response_code(400);
+                throw new Exception('Pembayaran Gagal');
             }
 
+            $transaksi = [
+                'jenis' => 3,
+                'asal' => $this->current_user,
+                'tujuan' => -1,
+                'nominal' => $_POST["jumlah"],
+            ];
+
+            if ($this->model('Transaksi_Model')->insert($transaksi) == -1)
+                throw new Exception('Terdapat masalah dalam membuat catatan');
+
             echo json_encode([
-                'message' => 'Top Up Berhasil'
+                'message' => 'Pembayaran Berhasil'
             ]);
         } catch (Exception $e) {
             echo json_encode([

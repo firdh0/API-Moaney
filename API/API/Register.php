@@ -22,8 +22,13 @@ class Register extends Controller
             }
 
             $email = $_POST["email"];
-            if ($this->model('Users_Model')->insert($_POST) == -1)
-                throw new Exception('Data akun gagal ditambahkan cok');
+            $data = [
+                'nama' => $_POST["nama"],
+                'email' => $_POST["email"],
+                'password' => $_POST["password"],
+            ];
+            if ($this->model('Users_Model')->insert($data) == -1)
+                throw new Exception('Data akun gagal ditambahkan');
 
             $result = $this->model('Users_Model')->query("SELECT * FROM user WHERE email = '$email'");
             if (!$result) {
