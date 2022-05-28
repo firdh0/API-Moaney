@@ -1,11 +1,11 @@
 <?= $this->extend('layout/template2'); ?>
 
 <?= $this->section('call-css'); ?> 
-<link rel="stylesheet" href="../css/utilities.css" />
-<link rel="stylesheet" href="../css/sidebar.css">
-<link rel="stylesheet" href="../css/dashboard.css" />
-<link rel="stylesheet" href="../css/detail-ds-topup.css">
-<link rel="stylesheet" href="../css/masuk.css">
+<link rel="stylesheet" href="./css/utilities.css" />
+<link rel="stylesheet" href="./css/sidebar.css">
+<link rel="stylesheet" href="./css/dashboard.css" />
+<link rel="stylesheet" href="./css/detail-ds-topup.css">
+<link rel="stylesheet" href="./css/masuk.css">
 <?= $this->endSection(); ?>
 
 <?= $this->section('content-template2'); ?>

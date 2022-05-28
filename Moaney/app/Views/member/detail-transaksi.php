@@ -10,14 +10,14 @@
     <!-- Transactions Detail -->
     <section class="transactions-detail overflow-auto">
         <?= $this->include('layout/profile') ?>
-        <?= $this->include('layout/menu2') ?> 
+        <?= $this->include('layout/menu2') ?>
             </div>
         </section>
         <main class="main-wrapper">
             <div class="ps-lg-0">
                 <h2 class="text-4xl fw-bold color-palette-1 mb-30">Detail #12312213 <span
                     class="purchase-back"><a href="../member/riwayat.html">
-                        <img src="../assets/img/back.svg" alt="" href="../member/riwayat.html">
+                        <img src="./assets/img/back.svg" alt="" href="../member/riwayat.html">
                 </a></span></h2>
                 <div class="details">
                     <div class="main-content main-content-card overflow-auto">
@@ -26,7 +26,7 @@
                                 <div class="game-checkout d-flex flex-row align-items-center">
                                     <div class="pe-4">
                                         <div class="cropped">
-                                            <img src="../assets/img/topup.svg" width="200" height="130"
+                                            <img src="./assets/img/topup.svg" width="200" height="130"
                                                 class="img-fluid" alt="">
                                         </div>
                                     </div>
@@ -59,11 +59,4 @@
             </div>
         </main>
     </section>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
-    </script>
-</body>
-
-</html>
+<?= $this->endSection(); ?>
